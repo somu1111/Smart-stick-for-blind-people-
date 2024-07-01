@@ -1,0 +1,95 @@
+// Define pin numbers for ultrasonic sensor 1
+const int TRIG_PIN1 = 5; // Trigger pin for ultrasonic sensor 1
+const int ECHO_PIN1 = 6; // Echo pin for ultrasonic sensor 1
+
+// Define pin numbers for ultrasonic sensor 2
+const int TRIG_PIN2 = 7; // Trigger pin for ultrasonic sensor 2
+const int ECHO_PIN2 = 8; // Echo pin for ultrasonic sensor 2
+
+// Define pin numbers for other components
+const int RAIN_SENSOR_PIN = 9;  // Rain sensor pin
+const int VIBRATION_PIN = 10;    // Vibration motor pin
+const int BUZZER_PIN = 11;       // Buzzer pin
+const int VOICE_MODULE_PIN = 12; // Voice module pin
+
+void setup() {
+  // Set pin modes for ultrasonic sensors
+  pinMode(TRIG_PIN1, OUTPUT); // TRIGGER pin for ultrasonic sensor 1
+  pinMode(ECHO_PIN1, INPUT);  // ECHO pin for ultrasonic sensor 1
+  pinMode(TRIG_PIN2, OUTPUT); // TRIGGER pin for ultrasonic sensor 2
+  pinMode(ECHO_PIN2, INPUT);  // ECHO pin for ultrasonic sensor 2
+  
+  // Set pin modes for other components
+  pinMode(RAIN_SENSOR_PIN, INPUT);   // Rain sensor pin
+  pinMode(VIBRATION_PIN, OUTPUT);    // Vibration motor pin
+  pinMode(BUZZER_PIN, OUTPUT);       // Buzzer pin
+  pinMode(VOICE_MODULE_PIN, OUTPUT);// Voice module pin
+  
+  // Initialize Serial communication
+  Serial.begin(9600);
+  
+  // Flash the buzzer as an indication of setup completion
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(100);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(100);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(100);
+}
+
+void loop() {
+  // Variables to store time and distances measured by ultrasonic sensors
+  float time, Distance1, Distance2;
+  int S; // Variable to store the state of the rain sensor
+  
+  // Read the state of the rain sensor
+  S = digitalRead(RAIN_SENSOR_PIN);
+  
+  // Measure distance using ultrasonic sensor 1
+  digitalWrite(TRIG_PIN1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN1, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN1, HIGH);
+  delayMicroseconds(10); 
+  digitalWrite(TRIG_PIN1, LOW);
+  delayMicroseconds(2);
+  time = pulseIn(ECHO_PIN1, HIGH);
+  Distance1 = time * 340 / 20000; // Calculate distance in centimeters
+  Serial.println(Distance1); // Print distance to Serial Monitor
+  delay(100);
+
+  // Measure distance using ultrasonic sensor 2
+  digitalWrite(TRIG_PIN2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN2, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN2, LOW);
+  delayMicroseconds(2);
+  time = pulseIn(ECHO_PIN2, HIGH);
+  Distance2 = time * 340 / 20000; // Calculate distance in centimeters
+  Serial.println(Distance2); // Print distance to Serial Monitor
+  delay(100);
+
+  // Check for obstacles and trigger actions based on sensor readings
+  if (Distance1 <= 40 && Distance2 <= 29 && S == 1) {
+    Serial.println("INFRONT OBJECT DETECTED");
+    // Flash the buzzer and perform other actions as needed
+  } else if (Distance2 >= 30 && Distance1 >= 42 && S == 1) {
+    Serial.println("INFRONT MANHOLE DETECTED");
+    // Flash the buzzer and perform other actions as needed
+  } else if (Distance1 >= 41 && Distance2 <= 28 && S == 0) {
+    Serial.println("INFRONT WATER DETECTED");
+    // Perform actions for detecting water
+  } else {
+    // Perform default actions
+  }
+}
